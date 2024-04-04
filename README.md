@@ -6,6 +6,9 @@ Since it uses ADSI, any user on any computer can enumerate Active Directory with
 This is a work in progress.
 
 TO-DO:
+
 Add RBCD functionality
+
 Add Kerberoasting/ASREProasting functionality for RC4 encryption (need to figure out how to implement tgt trick)
+
 Clean up, refactor, learn how to not make shit scripts lol
