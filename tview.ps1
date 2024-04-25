@@ -1,8 +1,6 @@
-$fqdn = $env:userdnsdomain
+t$fqdn = $env:userdnsdomain
 $parts = $fqdn.split('.')
 $full = "DC=" + ($parts -join ",DC=")
-
-write-output $full
 
 # Function to retrieve Domain Admins
 function Get-DomainAdmins {
@@ -27,8 +25,20 @@ function Get-DomainUsers {
 }
 
 function Get-DomainControllers {
-    $DCs = ([ADSISearcher] "(&(objectCategory=computer)(objectClass=computer))").FindAll().GetDirectoryEntry() | Where-Object -Property primarygroupID -match 516 |Select-Object -property @{Name='Domain Controllers'; Expression={$_.samaccountname.Replace("{", "").Replace("}", "")}},@{Name='Host Name'; Expression={$_.dnshostname.Replace("{", "").Replace("}", "")}},@{Name='OS1'; Expression={$_.operatingsystem.Replace("{", "").Replace("}", "")}}
-    $DCs
+    $DCs = ([ADSISearcher] "(&(objectCategory=computer)(objectClass=computer))").FindAll().GetDirectoryEntry() | Where-Object -Property primarygroupID -match 516
+    
+    foreach ($dc in $DCs) {
+        $DChostname = $dc.Properties["dnshostname"].Value
+        $DCoperatingsystem = $dc.Properties["operatingsystem"].Value
+        
+        if ($DCoperatingsystem -is [Array]) {
+            foreach ($os in $DCoperatingsystem) {
+                Write-Output "DC Hostname: $DChostname Operating System: $os"
+            }
+        } else {
+            Write-Output "DC Hostname: $DChostname Operating System: $DCoperatingsystem"
+        }
+    }
 }
 
 function Get-Kerberoasting {
