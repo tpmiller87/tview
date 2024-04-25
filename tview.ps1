@@ -1,11 +1,9 @@
-$fqdn = $env:userdnsdomain
-$parts = $fqdn.split('.')
-$full = "DC=" + ($parts -join ",DC=")
+$fqdn = ([adsisearcher]"(objectClass=domain)").findone().getdirectoryentry().distinguishedname
 
 # Function to retrieve Domain Admins
 function Get-DomainAdmins {
     # Retrieve Domain Admins group members
-    $domainAdmins = ([adsisearcher]"(memberof=cn=Domain Admins,cn=Users,$full)").FindAll().GetDirectoryEntry() | Select-Object -ExpandProperty samaccountname
+    $domainAdmins = ([adsisearcher]"(memberof=cn=Domain Admins,cn=Users,$fqdn)").FindAll().GetDirectoryEntry() | Select-Object -ExpandProperty samaccountname
 
     # Output Domain Admins
     Write-Output "Domain Admins"
