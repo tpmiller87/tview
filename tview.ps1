@@ -52,15 +52,24 @@ function Get-Unconstrained {
     $unconstrained
 }
 
-function Get-constrained {
-	$constrained = ([adsisearcher]'(msds-allowedtodelegateto=*)').findall().getdirectoryentry()
-	$constrainedHostname = $constrained |select-object -expandProperty dnshostname
-	$constrainedService = $constrained |select-object -expandproperty msDS-AllowedToDelegateTo
-	Write-Output "Computers configured with constrained delegation"
+function Get-Constrained {
+    $constrained = ([adsisearcher]'(msds-allowedtodelegateto=*)').FindAll().GetDirectoryEntry()
+    Write-Output "Computers configured with constrained delegation"
     Write-Output "--------------"
-    Write-Output "$constrainedHostname Service: $constrainedService"
-}
 
+    foreach ($entry in $constrained) {
+        $hostname = $entry.Properties["dnshostname"].Value
+        $services = $entry.Properties["msDS-AllowedToDelegateTo"].Value
+
+        if ($services -is [Array]) {
+            foreach ($service in $services) {
+                Write-Output "$hostname Service: $service"
+            }
+        } else {
+            Write-Output "$hostname Service: $services"
+        }
+    }
+}
 
 Write-Host -foregroundcolor green "+++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 Write-Host -foregroundcolor green -nonewline "++++++++++++++++++++"
