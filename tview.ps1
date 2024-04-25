@@ -1,4 +1,4 @@
-t$fqdn = $env:userdnsdomain
+$fqdn = $env:userdnsdomain
 $parts = $fqdn.split('.')
 $full = "DC=" + ($parts -join ",DC=")
 
